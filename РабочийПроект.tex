@@ -657,118 +657,87 @@
 
 \subsection{Модульное тестирование разработанной программной системы}
 
-Модульный тест\cite{hillard-packaging} для класса UNet из модуля model.py представлен на рисунке~\ref{model_test:image}.
+Модульный тест\cite{hillard-packaging} для класса UNet из модуля model.py представлен в таблице~\ref{table:unet_tests}.
 
-\begin{figure}[H]
-\begin{lstlisting}[language=Python]
-import unittest
-import torch
-from model import UNet
-
-class TestUNet(unittest.TestCase):
-	def test_model_initialization(self):
-		model = UNet(in_channels=1, out_channels=1)
-		self.assertIsInstance(model, UNet, "Должен создаваться экземпляр UNet")
+\renewcommand{\arraystretch}{0.8}
+\begin{xltabular}{\textwidth}{|X|X|X|}
+	\caption{Модульное тестирование класса UNet\label{table:unet_tests}} \\
+	\hline
+	\centrow Описание теста & 
+	\centrow Входные данные & 
+	\centrow Ожидаемый результат \\ 
+	\hline 
+	\endfirsthead
 	
-	def test_forward_pass(self):
-		model = UNet(in_channels=1, out_channels=1)
-		input_tensor = torch.randn(1, 1, 320, 624)
-		output = model(input_tensor)
-		self.assertEqual(output.shape, (1, 1, 320, 624), "Некорректный размер вывода")
-		self.assertTrue(torch.all(output >= 0), "Выход должен быть ≥ 0")
-		self.assertTrue(torch.all(output <= 1), "Выход должен быть ≤ 1")
-\end{lstlisting}  
-\caption{Модульный тест класса UNet}
-\label{model_test:image}
-\end{figure}
+	\caption*{Продолжение таблицы \ref{table:unet_tests}} \\
+	\hline 
+	\centrow Описание теста & 
+	\centrow Входные данные & 
+	\centrow Ожидаемый результат \\ 
+	\hline 
+	\endhead
+	
+	Проверка инициализации модели & UNet(in\_channels=1, out\_channels=1) &  Экземпляр класса UNet \\ \hline
+	Проверка прямого прохода & input\_tensor (1, 1, 320, 624) & Тензор размера (1, 1, 320, 624) \\ \hline
+	Проверка диапазона значений выхода модели & Тензор, полученный в предыдущем тесте & Все значения в диапазоне [0, 1] \\ \hline
+\end{xltabular}
+\renewcommand{\arraystretch}{1.0}
+\vspace{-\baselineskip}
 
-Результат тестирования:
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.7\linewidth]{images/model_test_results}
-	\caption{Результат тестирования класса UNet}
-	\label{fig:modeltestresults}
-\end{figure}
+Модульный тест для вычисления метрик модуля test.py представлен на рисунке~\ref{table:segmentation_metrics}.
 
-Модульный тест для вычисления метрик модуля test.py представлен на рисунке~\ref{test_test:image}.
+\renewcommand{\arraystretch}{0.8}
+\begin{xltabular}{\textwidth}{|X|X|X|}
+	\caption{Модульное тестирование модуля test.py \label{table:segmentation_metrics}}\\
+	\hline 
+	\centrow Описание теста & 
+	\centrow Входные данные & 
+	\centrow Ожидаемый результат \\ 
+	\hline 
+	\endfirsthead
+	
+	\caption*{Продолжение таблицы \ref{table:segmentation_metrics}}\\
+	\hline 
+	\centrow Описание теста & 
+	\centrow Входные данные & 
+	\centrow Ожидаемый результат \\ 
+	\hline 
+	\endhead
+	
+	Проверка расчёта Dice коэффициента & pred = [1, 1, 0, 0], target = [1, 0, 1, 0] &\( Dice \in [0, 1] \) \\ \hline
+	
+	Проверка расчёта IoU & pred = [1, 1, 0, 0], target = [1, 0, 1, 0] & \( IoU \in [0, 1] \) \\ \hline
+	
+\end{xltabular}
+\renewcommand{\arraystretch}{1.0}
+\vspace{-\baselineskip}
 
-\begin{figure}[H]
-	\begin{lstlisting}[language=Python]
-import unittest
-import torch
-from test import dice_coefficient, iou_score
+Модульный тест для класса analyze\_return из модуля detect.py представлен на рисунке~\ref{table:image_processing_tests}.
 
-class TestMetrics(unittest.TestCase):
-	def test_dice_coefficient(self):
-		pred = torch.tensor([1, 1, 0, 0], dtype=torch.float32)
-		target = torch.tensor([1, 0, 1, 0], dtype=torch.float32)
-		dice = dice_coefficient(pred, target)
-		self.assertTrue(0 <= dice <= 1, "Dice должен быть в [0, 1]")
-
-	def test_iou_score(self):
-		pred = torch.tensor([1, 1, 0, 0], dtype=torch.float32)
-		target = torch.tensor([1, 0, 1, 0], dtype=torch.float32)
-		iou = iou_score(pred, target)
-		self.assertTrue(0 <= iou <= 1, "IoU должен быть в [0, 1]")
-	\end{lstlisting}  
-	\caption{Модульный тест функций подсчета метрик модуля test.py}
-	\label{test_test:image}
-\end{figure}
-
-Результат тестирования:
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.7\linewidth]{images/test_test_results}
-	\caption{Результат тестирования функций подсчета метрик модуля test.py}
-	\label{fig:testtestresults}
-\end{figure}
-
-Модульный тест для класса analyze\_return из модуля detect.py представлен на рисунке~\ref{detect_test:image}.
-
-\begin{figure}[H]
-	\begin{lstlisting}[language=Python]
-import unittest
-import numpy as np
-import cv2
-import os
-import torch
-from unittest.mock import patch
-from detect import analyze_return
-
-	class TestDetect(unittest.TestCase):
-		def setUp(self):
-			self.test_img = np.random.randint(0, 255, (100, 100, 3), dtype=np.uint8)
-			self.img_path = "test_image.jpg"
-			cv2.imwrite(self.img_path, self.test_img)
-
-		def tearDown(self):
-			if os.path.exists(self.img_path):
-			os.remove(self.img_path)
-
-		@patch("detect.load_model")
-		def test_analyze_save(self, mock_load_model):
-			mock_model = mock_load_model.return_value
-			mock_model.return_value = torch.sigmoid(torch.randn(1, 1, 320, 624))
-
-
-			result = analyze_return(self.img_path, "dummy_model.pth")
-			self.assertIsInstance(result, np.ndarray, "Должен возвращаться numpy-массив")
-			self.assertEqual(result.shape[2], 3, "Изображение должно быть 3-канальным (BGR)")
-
-	\end{lstlisting}  
-	\caption{Модульный тест класса analyze\_return}
-	\label{detect_test:image}
-\end{figure}
-
-Результат тестирования:
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.7\linewidth]{images/detect_test_results}
-	\caption{Результат тестирования класса analyze\_return}
-	\label{fig:detecttestresults}
-\end{figure}
-
-
+\renewcommand{\arraystretch}{0.8}
+\begin{xltabular}{\textwidth}{|X|X|X|}
+	\caption{Модульное тестирования класса analyze\_return\label{table:image_processing_tests}}\\
+	\hline 
+	\centrow Описание теста & 
+	\centrow Входные данные & 
+	\centrow Ожидаемый результат \\ 
+	\hline 
+	\endfirsthead
+	
+	\caption*{Продолжение таблицы \ref{table:image_processing_tests}}\\
+	\hline 
+	\centrow Описание теста & 
+	\centrow Входные данные & 
+	\centrow Ожидаемый результат \\ 
+	\hline 
+	\endhead
+	
+	Проверка возврата изображения после анализа & \parbox[t]{\linewidth}{self.img\_path -- путь к сгенерированному тестовому изображению; \\ mock\_load\_model -- имитация параметров модели нейросети}  &  Изображение в формате np.ndarray \\ \hline
+	
+	Проверка размерности выходного изображения & result -- изображение в формате np.ndarray из прошлого теста & result.shape[2] == 3 -- трехканальное BGR изображение \\ \hline
+	
+\end{xltabular}
+\renewcommand{\arraystretch}{1.0}
 
 \subsection{Системное тестирование разработанной программной системы}
 
