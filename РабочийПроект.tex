@@ -159,7 +159,7 @@
 	\begin{itemize}
 		\item image\_path (тип str) -- путь к анализируемому изображению;
 		\item weights (тип str) -- путь к оцениваемым весам модели;
-		\item threshold (тип float, значение по умолчанию = 0,5) -- порог для бинаризации масок
+		\item threshold (тип float, значение по умолчанию = 0,3) -- порог для бинаризации масок
 	\end{itemize}
 	Возвращаемые данные -- значения коэффициентов Dice и IoU, исходное изображение, ожидаемую маску, полученную при помощи пороговой бинаризации и предсказанную сетью маску в виде словаря dict.
 \end{enumerate}
@@ -248,9 +248,15 @@
 	\endfoot
 	
 	epoch\_start\_signal & pyqtSignal[int, int] & сигнал начала эпохи, содержащий её номер и общее количество эпох \\ \hline
-	epoch\_complete\_signal & pyqtSignal[int, float] & сигнал завершения эпохи, содержащий её номер и среднее значение потери при обучении \\ \hline
+	epoch\_complete\_signal & pyqtSignal[[int, float, float, float, float] & сигнал завершения эпохи, содержащий её номер и средние значения потерь при обучении, потерь на тестовой выборке, метрик Dice и IoU \\ \hline
 	batch\_progress\_signal & pyqtSignal[int, int, float] & сигнал прогресса обработки батча, содержащий его номер, потерю, общее число батчей \\ \hline
 	training\_complete\_signal & pyqtSignal[str] & сигнал завершения обучения \\ \hline
+	image\_dir & str & Путь к папке с датасетом \\ \hline
+	save\_path & str & Путь для сохранения весов модели \\ \hline
+	batch\_size & int & Размер батча для обучения \\ \hline
+	epochs & int & Количество эпох обучения \\ \hline
+	lr & float & Скорость обучения \\ \hline
+	threshold & float & Порог для создания обучающих и тестовых масок \\ \hline
 \end{xltabular}
 Методы класса представлены в таблице~\ref{table:Trainer_method}.
 \renewcommand{\arraystretch}{0.8} % уменьшение расстояний до сетки таблицы
@@ -294,7 +300,7 @@
 	\begin{itemize}
 		\item image\_path (тип str) -- путь к анализируемому изображению;
 		\item model\_path (тип str) -- путь к файлу параметров нейронной сети;
-		\item threshold (тип float, значение по умолчанию -- 0,5) -- порог для бинаризации маски.
+		\item threshold (тип float, значение по умолчанию -- 0,3) -- порог для бинаризации маски.
 	\end{itemize}
 	Возвращаемые данные -- изображение с выделенными распознанными нефтяными пятнами в формате np.ndarray.
 \end{enumerate}
@@ -794,7 +800,7 @@
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.7\linewidth]{"images/обучение главное окно"}
-	\caption{Окно режима"<Обучение">}
+	\caption{Окно режима "<Обучение">}
 	\label{fig:train_ui}
 \end{figure}
 
